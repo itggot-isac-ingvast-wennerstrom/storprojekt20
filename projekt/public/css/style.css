@@ -1,0 +1,23 @@
+.body {
+	background: rgba(0, 0, 0, 0.2);
+}
+
+.head_nav {
+	height: 4rem;
+	background: blue;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+.head_nav form .search_bar {
+	height: 2rem;
+	border: none;
+	border-radius: 1rem 0 0 1rem;
+}
+
+.head_nav form .search_btn {
+	height: 2rem;
+}
