@@ -1,0 +1,8 @@
+form action="/create_user" method="post"
+    input# type="text" name="username" placeholder="Username"/
+    input# type="password" name="password" placeholder="Password"/
+    input# type="password" name="password_conf" placeholder="Password Confirmation"/
+    input# type="email" name="email"/
+    input type="submit" value="Create user"/
+
+p = session[:error_msg]
