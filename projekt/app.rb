@@ -41,7 +41,7 @@ end
 post('/sign_in_user') do
     session[:error_msg] = ""
     db = connect_to_db('database/db.db')
-    result = db.execute('SELECT password_digest,id FROM users WHERE username = ?', params[:username])
+    result = select('users', 'username',params[:username])
     if result == []
         session[:error_msg] = "No user with that username"
         redirect('/sign_in')
@@ -75,9 +75,8 @@ post('/create_user') do
         redirect('/sign_up')
     end
     password_digest = BCrypt::Password.create(password)
-    db = connect_to_db('database/db.db')
-    db.execute('INSERT INTO users (username,password_digest,role,points,email) Values (?,?,"user",0,?)', [username,password_digest,email])
-    session[:user_id] = db.execute('SELECT id FROM users WHERE password_digest =?', password_digest)
+    insert('users', ['username','password_digest','role','points','email'], [username,password_digest,'user',0,email])
+    session[:user_id] = select('users','username',username,'id')
     redirect('/new_user_registred')
 end
 
@@ -101,6 +100,6 @@ get('/profile/:username') do
 end
 
 get('/test') do 
-    result = select('users', 'username', 'Isac')
+    result = select('users', 'username', 'hej')
     slim(:test,locals:{result:result})
 end
