@@ -3,15 +3,18 @@ require 'sinatra'
 require 'sqlite3'
 require 'bcrypt'
 
+#Loads documents with functions
 load 'functions.rb'
 load 'db_function.rb'
 
 enable :sessions
 
+#Routes to Main 
 get('/') do
     slim(:main)
 end
 
+#Checks if the user is logged in and it's authorization
 before do
     if session[:user_id] == nil
         case request.path_info
@@ -34,19 +37,23 @@ before do
     end
 end 
 
+#Routes to Sign_in
 get('/sign_in') do
     slim(:'user/sign_in')
 end
 
+#Post command that signs a user in to the website
 post('/sign_in_user') do
     session[:error_msg] = ""
-    db = connect_to_db('database/db.db')
+    #Checks if there is a user with the same username
     result = select('users', 'username',params[:username])
     if result == []
         session[:error_msg] = "No user with that username"
         redirect('/sign_in')
     end
+    #Encrypts the password and checks if the passwords match
     if BCrypt::Password.new(result[0]['password_digest']) == params[:password]
+        #Tells the website the user is logged in
         session[:user_id] = result[0]['id']
         redirect('/profile')
     else
@@ -55,10 +62,12 @@ post('/sign_in_user') do
     end
 end
 
+#Routes to Sign_up
 get('/sign_up') do
     slim(:'user/create_user')
 end
 
+#Post that creates a user
 post('/create_user') do
     session[:error_msg] = ""
     username = params[:username]
@@ -74,23 +83,23 @@ post('/create_user') do
         session[:error_msg] = "Invalid email"
         redirect('/sign_up')
     end
+    #Encrypts password
     password_digest = BCrypt::Password.create(password)
+    #Inserts values into the database
     insert('users', ['username','password_digest','role','points','email'], [username,password_digest,'user',0,email])
+    #Tells the website the user is logged in
     session[:user_id] = select('users','username',username,'id')
     redirect('/new_user_registred')
 end
 
+#Routes to new_user_registred
 get('/new_user_registred') do
     slim(:'user/new_user_reg')
 end
 
-get('/profile') do
-    db = connect_to_db('database/db.db')
-end
-
+#Restful route to the selected users profile
 get('/profile/:username') do
-    db = connect_to_db('database/db.db')    
-    result = db.execute('SELECT * FROM users WHERE username = ?', params[:username])
+    result = select('users', 'username', params[:username])
     if session[:user_id] == result[0]['id']
         is_user = true
     else
@@ -99,6 +108,7 @@ get('/profile/:username') do
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
+#Test routes for different functions 
 get('/test') do 
     result = select('users', 'username', 'hej')
     slim(:test,locals:{result:result})
