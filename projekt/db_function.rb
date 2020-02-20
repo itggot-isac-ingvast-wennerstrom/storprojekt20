@@ -14,6 +14,9 @@ end
 def select(table, search, search_values, elements='*', database_path='database/db.db')
     db = connect_to_db(database_path)
     #Construction of SQL string
+    if search_values.is_a?(Integer)
+        search_values = search_values.to_s
+    end
     sql_str = 'SELECT ' + elements + ' FROM ' + table + ' WHERE ' + search + " = '" + search_values + "'"
     return db.execute(sql_str)
 end

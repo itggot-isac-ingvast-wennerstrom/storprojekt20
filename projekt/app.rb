@@ -16,6 +16,7 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
+    session[:user_id] = 1
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -112,7 +113,8 @@ get('/profile/:username') do
 end
 
 get('/profile') do
-    
+    result = select('users', 'id', session[:user_id])
+    slim(:'user/profile',locals:{profile:result[0],is_user:true})
 end
  
 #Test routes for different functions 
