@@ -67,3 +67,18 @@ def insert(table, elements, values, database_path='database/db.db')
     #Execute SQL string
     db.execute(sql_str)
 end
+
+def sign_in(username, password)
+    result = select('users', 'username',params[:username])
+    #Checks if there's a user with that username
+    if result == []
+        return 'wrong username'
+    end
+    #Encrypts the password and checks if the passwords match
+    if BCrypt::Password.new(result[0]['password_digest']) == password
+        return result[0]['id']
+    else
+        return "wrong password"
+    end
+
+end

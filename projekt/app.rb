@@ -37,6 +37,10 @@ before do
     end
 end 
 
+after do
+    session[:error_msg] = ""
+end
+
 #Routes to Sign_in
 get('/sign_in') do
     slim(:'user/sign_in')
@@ -45,20 +49,18 @@ end
 #Post command that signs a user in to the website
 post('/sign_in_user') do
     session[:error_msg] = ""
-    #Checks if there is a user with the same username
-    result = select('users', 'username',params[:username])
-    if result == []
+    result = sign_in(params[:username], params[:password])
+    #
+    case result
+    when 'wrong username'
         session[:error_msg] = "No user with that username"
-        redirect('/sign_in')
-    end
-    #Encrypts the password and checks if the passwords match
-    if BCrypt::Password.new(result[0]['password_digest']) == params[:password]
-        #Tells the website the user is logged in
-        session[:user_id] = result[0]['id']
-        redirect('/profile')
-    else
+        break
+    when 'wrong password'
         session[:error_msg] = "Password is wrong"
-        redirect('/sign_in')
+        break
+    else
+        session[:user_id] = result
+        redirect('/')
     end
 end
 
@@ -109,6 +111,10 @@ get('/profile/:username') do
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
+get('/profile') do
+    
+end
+ 
 #Test routes for different functions 
 get('/test') do 
     result = select('users', 'username', 'hej')
