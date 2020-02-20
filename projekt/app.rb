@@ -70,26 +70,27 @@ end
 #Post that creates a user
 post('/create_user') do
     session[:error_msg] = ""
-    username = params[:username]
-    password = params[:password]
-    password_conf = params[:password_conf]
-    email = params[:email]
-    if password != password_conf #Checking if passwords match
+    if params[:password] != params[:password_conf] #Checking if passwords match
         session[:error_msg] = "Passwords do not match"
         redirect('/sign_up')
     end
-    valid_email = validate_email(email) #Validate email from function.rb
+    valid_email = validate_email(params[:email]) #Validate email from function.rb
     if !valid_email 
         session[:error_msg] = "Invalid email"
         redirect('/sign_up')
     end
     #Encrypts password
-    password_digest = BCrypt::Password.create(password)
+    password_digest = BCrypt::Password.create(params[:password])
     #Inserts values into the database
-    insert('users', ['username','password_digest','role','points','email'], [username,password_digest,'user',0,email])
-    #Tells the website the user is logged in
-    session[:user_id] = select('users','username',username,'id')
-    redirect('/new_user_registred')
+    if select('users', 'username',params[:username]) == []
+        insert('users', ['username','password_digest','role','points','email'], [params[:username],     password_digest,'user',0,params[:email]])
+        #Tells the website the user is logged in
+        session[:user_id] = select('users','username',params[:username],'id')
+        redirect('/new_user_registred')
+    else
+        session[:error_msg] = "Account already exists with that username"
+        redirect('/sign_up')
+    end
 end
 
 #Routes to new_user_registred
