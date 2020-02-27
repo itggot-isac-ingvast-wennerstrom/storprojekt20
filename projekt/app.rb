@@ -121,3 +121,7 @@ get('/test') do
     result = select('users', 'username', 'Isac')
     slim(:test,locals:{result:result})
 end
+
+get('/create_post') do
+    slim(:'/posts/create_post')
+end

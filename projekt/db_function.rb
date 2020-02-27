@@ -122,5 +122,4 @@ def sign_in(username, password)
     else
         return "wrong password"
     end
-
 end

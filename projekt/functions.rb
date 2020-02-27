@@ -31,4 +31,7 @@ def arr_to_str(input, mod='')
     return str
 end
 
-
+def generate_text_id(number)
+    charset = Array('A'..'Z') + Array('a'..'z') + Array('0'..'9') + ['.', '_', '-', '%']
+    return Array.new(number) { charset.sample }.join
+end
