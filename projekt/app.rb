@@ -16,7 +16,7 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
-    session[:user_id] = 1
+    session[:user_id] = 3
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -51,7 +51,6 @@ end
 post('/sign_in_user') do
     session[:error_msg] = ""
     result = sign_in(params[:username], params[:password])
-    #
     case result
     when 'wrong username'
         session[:error_msg] = "No user with that username"
@@ -119,6 +118,6 @@ end
  
 #Test routes for different functions 
 get('/test') do 
-    result = select('users', 'username', 'hej')
+    result = select('users', 'username', 'Isac')
     slim(:test,locals:{result:result})
 end

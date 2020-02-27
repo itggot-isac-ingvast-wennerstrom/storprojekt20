@@ -3,6 +3,8 @@ require 'slim'
 require 'sinatra'
 require 'bcrypt'
 
+load 'functions.rb'
+
 #Connects to the disered database
 def connect_to_db(path) #path is a string
     db = SQLite3::Database.new(path)
@@ -10,30 +12,59 @@ def connect_to_db(path) #path is a string
     return db   
 end
 
-#Takes a set of inputs and constructs, executes, selects and returns the correct values
+#Constructs and executes a SELECT command in SQL
 def select(table, search, search_values, elements='*', database_path='database/db.db')
+    #Connects to Database
     db = connect_to_db(database_path)
-    #Construction of SQL string
-    if search_values.is_a?(Integer)
-        search_values = search_values.to_s
+    #Checks if search_values is the same length as search
+    if search.is_a?(Array) != search_values.is_a?(Array)
+        session[:error_msg] = "SQL Error"
+        return []
     end
-    sql_str = 'SELECT ' + elements + ' FROM ' + table + ' WHERE ' + search + " = '" + search_values + "'"
-    return db.execute(sql_str)
-end
-
-
-# Takes an array as input and converts it into a string of values or elements for SQL
-def arr_to_str(input, mod='')
-    str = "("
-    input.each do |item|
-        if item.is_a?(String)
-            str+= mod + item + mod + ','
-        else
-            str+= item.to_s + ','
-        end
+    if search.is_a?(Array) && search_values.length != search.length 
+        session[:error_msg] = "SQL Error"
+        return []
     end
-    str[-1] = ')'
-    return str
+    #Creates array of search parameters and respective values
+    if search.is_a?(Array)
+        search_arr = search + search_values
+        #Creates a string of ? to match the length of the search_values
+        question_str = ''
+        num = search_values.length
+        num.times {question_str += '?,'}
+        question_str[-1] = ''
+        search_str = arr_to_str(search)
+    else
+        search_arr = search_values
+        question_str = '?'
+        search_str = search
+    end
+    #Cases for different table types
+    case table
+    when 'users'
+        #Creates SQL string to execute
+        sql_str = 'SELECT * FROM users WHERE ' + search_str + ' = ' + question_str
+        #Execute SQL string with respective values
+        result = db.execute(sql_str, search_arr)
+    when 'comments'
+        #Creates SQL string to execute
+        sql_str = 'SELECT * FROM comments WHERE ' + search_str + ' = ' + question_str
+        #Execute SQL string with respective values
+        result = db.execute(sql_str, search_arr)
+    when 'posts'
+        #Creates SQL string to execute
+        sql_str = 'SELECT * FROM posts WHERE ' + search_str + ' = ' + question_str
+        #Execute SQL string with respective values
+        result = db.execute(sql_str, search_arr)
+    when 'genre'
+        #Creates SQL string to execute
+        sql_str = 'SELECT * FROM genre WHERE ' + search_str + ' = ' + question_str
+        #Execute SQL string with respective values
+        result = db.execute(sql_str, search_arr)
+    else
+        session[:error_msg] = 'SQL Error'
+    end
+    return result
 end
 
 #Constructs and executes an INSERT command in SQL
