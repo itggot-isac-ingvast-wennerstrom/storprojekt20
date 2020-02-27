@@ -38,37 +38,45 @@ end
 
 #Constructs and executes an INSERT command in SQL
 def insert(table, elements, values, database_path='database/db.db')
+    #Connects to Database
     db = connect_to_db(database_path)
-    sql_str = ''    
-    #If an argument is empty it returns an error message.
-    if table == "" || elements == "" || values == ""
-        session[:error_msg] = "One argument is empty"
+    #Checks if values is the same length as elements
+    if values.length != elements.length
+        session[:error_msg] = "SQL Error"
         return nil
     end
-    #Checks if it's an array of elements or values
-    if elements.is_a?(Array)
-        if values.is_a?(Array)
-            #Checks that the number of elements and values matches
-            if values.length == elements.length
-                #Converts the arrays into SQL friendly strings
-                values = arr_to_str(values, '"')
-                elements = arr_to_str(elements)
-                #Constructs SQL string
-                sql_str = 'INSERT INTO '+table+' '+elements+' VALUES '+values
-            else
-                session[:error_msg] = 'Wrong number of elements or values'
-                return nil
-            end
-        else 
-            session[:error_msg] = 'Wrong number of elements or values'
-            return nil
-        end
-    else
-        #If it's not an array continue as normal and construct SQL string
-        sql_str = 'INSERT INTO '+table+' '+elements+' VALUES '+values
+    #Creates a string of ? to match the length of the values
+    question_str = ''
+    num = values.length
+    num.times {question_str += '?,'}
+    question_str[-1] = ')'
+    #Creates String of elements
+    elements_str = arr_to_str(elements)
+    #Cases for different table types
+    case table
+    when 'users'
+        #Creates SQL String to execute
+        sql_str = 'INSERT INTO users ' + elements_str + ' VALUES (' + question_str
+        #Executes SQL String with the respective values
+        db.execute(sql_str, values)        
+    when 'posts'
+        #Creates SQL String to execute
+        sql_str = 'INSERT INTO posts ' + elements_str + ' VALUES (' + question_str
+        #Executes SQL String with the respective values
+        db.execute(sql_str, values)
+    when 'comments'
+        #Creates SQL String to execute
+        sql_str = 'INSERT INTO comments ' + elements_str + ' VALUES (' + question_str
+        #Executes SQL String with the respective values
+        db.execute(sql_str, values)        
+    when 'genre'
+        #Creates SQL String to execute
+        sql_str = 'INSERT INTO genre ' + elements_str + ' VALUES (' + question_str
+        #Executes SQL String with the respective values
+        db.execute(sql_str, values)           
+    else 
+        session[:error_msg] = "SQL Error"
     end
-    #Execute SQL string
-    db.execute(sql_str)
 end
 
 def sign_in(username, password)

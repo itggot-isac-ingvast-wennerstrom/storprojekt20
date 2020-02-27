@@ -86,7 +86,7 @@ post('/create_user') do
     password_digest = BCrypt::Password.create(params[:password])
     #Inserts values into the database
     if select('users', 'username',params[:username]) == []
-        insert('users', ['username','password_digest','role','points','email'], [params[:username],     password_digest,'user',0,params[:email]])
+        insert('users', ['username','password_digest','role','points','email'], [params[:username], password_digest,'user',0,params[:email]])
         #Tells the website the user is logged in
         session[:user_id] = select('users','username',params[:username],'id')
         redirect('/new_user_registred')

@@ -16,3 +16,4 @@ def validate_email(email)
     end
     return false
 end
+
