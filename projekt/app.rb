@@ -130,7 +130,8 @@ end
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
     id = image_to_dir(params[:image])
-    
+    insert('posts', ['content_image', 'content_title', 'content_text', 'points', 'date', 'user_id'], [id, params[:title], params[:content_text], 0, Time.now.to_i, session[:user_id]])
+    redirect('/')    
 end
 
 get('/view_post/:post_id') do
