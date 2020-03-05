@@ -111,6 +111,7 @@ get('/profile/:username') do
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
+#Look at your own profile
 get('/profile') do
     result = select('users', 'id', session[:user_id])
     slim(:'user/profile',locals:{profile:result[0],is_user:true})
@@ -124,4 +125,14 @@ end
 
 get('/create_post') do
     slim(:'/posts/create_post')
+end
+
+post('/create_post_db') do
+    #calls image_to_dir function from function.rb
+    id = image_to_dir(params[:image])
+    
+end
+
+get('/view_post/:post_id') do
+    
 end

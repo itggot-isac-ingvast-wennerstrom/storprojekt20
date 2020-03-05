@@ -1,4 +1,6 @@
-form action="/create_post" method="post"
+form action="/create_post_db" method="post" enctype="multipart/form-data" 
+    
     input# type="text" name="title"/
     input# type="text" name="content_text"/
-    input# type="file" name="image" accept="image/png, image/jpeg, .png, .jpeg"/
+    input# type="file" name="image" accept="image/*, video/*"/
+    input type="submit" value="Create Post"/

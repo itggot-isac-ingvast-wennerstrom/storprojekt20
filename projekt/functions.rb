@@ -1,3 +1,5 @@
+require 'fileutils'
+
 #Validates email
 def validate_email(email)
     first_check = false
@@ -31,7 +33,20 @@ def arr_to_str(input, mod='')
     return str
 end
 
+#Generates a text id
 def generate_text_id(number)
-    charset = Array('A'..'Z') + Array('a'..'z') + Array('0'..'9') + ['.', '_', '-', '%']
+    charset = Array('A'..'Z') + Array('a'..'z') + Array('0'..'9') + ['_', '-']
     return Array.new(number) { charset.sample }.join
 end
+
+def image_to_dir(image, dest='img')
+    #Generates text id for img
+    id = generate_text_id(15)
+    filename = id + File.extname(image[:filename])
+    tempfile = image[:tempfile]
+    target = "public/img/#{filename}"
+    #Writes file to target
+    File.open(target, 'wb') {|f| f.write tempfile.read }
+    return id
+end
+
