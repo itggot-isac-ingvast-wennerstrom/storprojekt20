@@ -16,8 +16,8 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
-    #session[:error_msg] = ""
-    #session[:user_id] = 3
+    session[:error_msg] = ""
+    session[:user_id] = 3
     if session[:user_id] == nil
         case request.path_info
         when '/'
