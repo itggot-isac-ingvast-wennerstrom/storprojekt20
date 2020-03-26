@@ -16,7 +16,8 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
-    session[:user_id] = 3
+    #session[:error_msg] = ""
+    #session[:user_id] = 3
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -38,10 +39,6 @@ before do
     end
 end 
 
-after do
-    session[:error_msg] = ""
-end
-
 #Routes to Sign_in
 get('/sign_in') do
     slim(:'user/sign_in')
@@ -49,7 +46,6 @@ end
 
 #Post command that signs a user in to the website
 post('/sign_in_user') do
-    session[:error_msg] = ""
     result = sign_in(params[:username], params[:password])
     case result
     when 'wrong username'
@@ -64,14 +60,13 @@ post('/sign_in_user') do
     end
 end
 
-#Routes to Sign_up
+#Routes to Sign_up  
 get('/sign_up') do
     slim(:'user/create_user')
 end
 
 #Post that creates a user
 post('/create_user') do
-    session[:error_msg] = ""
     if params[:password] != params[:password_conf] #Checking if passwords match
         session[:error_msg] = "Passwords do not match"
         redirect('/sign_up')
@@ -119,7 +114,8 @@ end
  
 #Test routes for different functions 
 get('/test') do 
-    result = select('users', 'username', 'Isac')
+    result = select('users', 'username', 'hur')
+    p result
     slim(:test,locals:{result:result})
 end
 
