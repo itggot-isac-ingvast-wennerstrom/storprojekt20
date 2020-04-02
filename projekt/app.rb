@@ -119,8 +119,8 @@ get('/test') do
     slim(:test,locals:{result:result})
 end
 
-get('/create_post') do
-    slim(:'/posts/create_post')
+get('/post/create') do
+    slim(:'/posts/create')
 end
 
 post('/create_post_db') do
@@ -130,6 +130,16 @@ post('/create_post_db') do
     redirect('/')    
 end
 
-get('/view_post/:post_id') do
-    
+get('/post/view/:post_id') do
+    search = ""
+    num_str = "1234567890"
+    params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
+    result = select('posts', search ,params[:post_id])
+    if result == []
+        session[:error_msg] = "No post with that Id was found"
+    end
+    user = select('users', 'id', result[0]['user_id'])
+    p result[0]['date']
+    age = time_since_created(result[0]['date'])
+    slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age})
 end

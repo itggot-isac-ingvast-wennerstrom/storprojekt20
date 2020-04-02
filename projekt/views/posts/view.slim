@@ -1,0 +1,10 @@
+div class="post_show"
+    h1 = info['content_title']
+    div class="post_info"
+        p = info['points']
+        - if info['genre'] != nil
+            p = info['genre']
+        p = user['username']
+        p = age
+    br/
+    p = info['content_text']
