@@ -80,7 +80,7 @@ post('/create_user') do
     password_digest = BCrypt::Password.create(params[:password])
     #Inserts values into the database
     if select('users', 'username',params[:username]) == []
-        insert('users', ['username','password_digest','role','points','email'], [params[:username], password_digest,'user',0,params[:email]])
+        insert('users', ['username','password_digest','role','email'], [params[:username], password_digest,'user',params[:email]])
         #Tells the website the user is logged in
         session[:user_id] = select('users','username',params[:username],'id')
         redirect('/new_user_registred')
@@ -126,12 +126,12 @@ end
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
     id = image_to_dir(params[:image])
-    insert('posts', ['content_image', 'content_title', 'content_text', 'points', 'date', 'user_id'], [id, params[:title], params[:content_text], 0, Time.now.to_i, session[:user_id]])
+    insert('posts', ['content_image', 'content_title', 'content_text', 'date', 'user_id'], [id, params[:title], params[:content_text], Time.now.to_i, session[:user_id]])
     redirect('/')    
 end
 
-get('/post/view/:post_id') do
-    search = ""
+get('/view_post/:post_id') do
+    puts "hej"
     num_str = "1234567890"
     params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
     result = select('posts', search ,params[:post_id])
@@ -139,7 +139,6 @@ get('/post/view/:post_id') do
         session[:error_msg] = "No post with that Id was found"
     end
     user = select('users', 'id', result[0]['user_id'])
-    p result[0]['date']
     age = time_since_created(result[0]['date'])
     slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age})
 end

@@ -1,5 +1,9 @@
 div class="post_show"
     h1 = info['content_title']
+    - if info['content_image']
+        - path = "img/#{info['content_image']}.png"
+        img src=path alt="Post image"/
+    
     div class="post_info"
         p = info['points']
         - if info['genre'] != nil
@@ -8,3 +12,4 @@ div class="post_show"
         p = age
     br/
     p = info['content_text']
+
