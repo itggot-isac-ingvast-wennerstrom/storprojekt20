@@ -23,3 +23,18 @@
 	height: 2rem;
 	border-radius: 0 1rem 1rem 0;
 }
+
+.post_show {
+	width: 100vw;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.post_show .post_info {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 40vw;
+}

@@ -1,15 +1,18 @@
 div class="post_show"
     h1 = info['content_title']
-    - if info['content_image']
-        - path = "img/#{info['content_image']}.png"
-        img src=path alt="Post image"/
+    
     
     div class="post_info"
-        p = info['points']
+        p = "Points: " + info['points'].to_s
         - if info['genre'] != nil
-            p = info['genre']
-        p = user['username']
+            p = "Post genres: " + info['genre']
+        p = "Posted by user " + user['username']
         p = age
     br/
+    - if info['content_image']
+        - path = "../../img/#{info['content_image']}.png"
+        img src=path alt="Post image"/
+    br/
+
     p = info['content_text']
 

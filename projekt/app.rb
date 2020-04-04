@@ -11,7 +11,7 @@ enable :sessions
 
 #Routes to Main 
 get('/') do
-    slim(:main)
+    slim(:home)
 end
 
 #Checks if the user is logged in and it's authorization
@@ -130,7 +130,7 @@ post('/create_post_db') do
     redirect('/')    
 end
 
-get('/view_post/:post_id') do
+get('/post/view/:post_id') do
     puts "hej"
     num_str = "1234567890"
     params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
