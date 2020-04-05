@@ -8,20 +8,20 @@ div class="post_show"
             p = "Post genres: " + info['genre']
         p = "Posted by user " + user['username']
         p = age
+    p = info['content_text']
+
     br/
     - if info['content_image']
         - path = "/img/#{info['content_image']}.png"
         img src=path alt="Post image"/
     br/
 
-    p = info['content_text']
-
     p id ="create_comment_fold" Create a comment
-    div class="create_comment"
-        form action="/create_comment" method="post"
-            input type="hidden" name="post_id"
-            textarea# name="content" cols="30" rows="10" placeholder="Write your comment here..."
-            input type="submit" value="Create"/
+    form action="/create_comment" method="post" class="create_comment"
+        - post_id = info['id'].to_s
+        input type="hidden" name="post_id"  value=post_id
+        textarea# name="content" cols="30" rows="10" placeholder="Write your comment here..."
+        input type="submit" value="Create"/
 
     div class="comments"
         - comments.each do |comment|

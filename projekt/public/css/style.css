@@ -45,8 +45,8 @@
 
 .create_comment {
 	display: flex;
+	flex-direction: row;
 	align-items: center;
-	flex-direction: column;
 	justify-content: center;
 	width: 70vw;
 	background: lightgray;
@@ -59,7 +59,17 @@
 }
 
 .create_comment input {
-	width: 20vw;
+	width: 10vw;
+	background: transparent;
+	border: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+}
+
+.create_comment input:hover {
+	background: darkcyan;
 }
 
 .comments {
