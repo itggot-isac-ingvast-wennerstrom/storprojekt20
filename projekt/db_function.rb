@@ -43,22 +43,22 @@ def select(table, search, search_values, elements='*', database_path='database/d
     case table
     when 'users'
         #Creates SQL string to execute
-        sql_str = 'SELECT * FROM users WHERE ' + search_str + ' = ' + question_str
+        sql_str = 'SELECT '+ elements +' FROM users WHERE ' + search_str + ' = ' + question_str
         #Execute SQL string with respective values
         result = db.execute(sql_str, search_arr)
     when 'comments'
         #Creates SQL string to execute
-        sql_str = 'SELECT * FROM comments WHERE ' + search_str + ' = ' + question_str
+        sql_str = 'SELECT '+ elements +' FROM comments WHERE ' + search_str + ' = ' + question_str
         #Execute SQL string with respective values
         result = db.execute(sql_str, search_arr)
     when 'posts'
         #Creates SQL string to execute
-        sql_str = 'SELECT * FROM posts WHERE ' + search_str + ' = ' + question_str
+        sql_str = 'SELECT '+ elements +' FROM posts WHERE ' + search_str + ' = ' + question_str
         #Execute SQL string with respective values
         result = db.execute(sql_str, search_arr)
     when 'genre'
         #Creates SQL string to execute
-        sql_str = 'SELECT * FROM genre WHERE ' + search_str + ' = ' + question_str
+        sql_str = 'SELECT '+ elements +' FROM genre WHERE ' + search_str + ' = ' + question_str
         #Execute SQL string with respective values
         result = db.execute(sql_str, search_arr)
     else

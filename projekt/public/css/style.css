@@ -25,7 +25,6 @@
 }
 
 .post_show {
-	width: 100vw;
 	display: flex;
 	align-items: center;
 	flex-direction: column;
@@ -37,4 +36,41 @@
 	align-items: center;
 	justify-content: space-between;
 	width: 40vw;
+}
+
+#create_comment_fold {
+	text-decoration: underline;
+	user-select: none;
+}
+
+.create_comment {
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	width: 70vw;
+	background: lightgray;
+}
+
+.create_comment textarea {
+	border-radius: 2rem;
+	width: 50vw;
+	padding: 1rem;
+}
+
+.create_comment input {
+	width: 20vw;
+}
+
+.comments {
+	background: lightcyan;
+	display: flex;
+	width: 60vw;
+	flex-direction: column;
+}
+
+.comment_head {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
 }

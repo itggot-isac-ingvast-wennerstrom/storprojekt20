@@ -131,14 +131,27 @@ post('/create_post_db') do
 end
 
 get('/post/view/:post_id') do
-    puts "hej"
     num_str = "1234567890"
     params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
     result = select('posts', search ,params[:post_id])
     if result == []
         session[:error_msg] = "No post with that Id was found"
+        slim(:main)
+    else
+        user = select('users', 'id', result[0]['user_id'])
+        comments = select('comments', 'post_id', params[:post_id])
+        age = time_since_created(result[0]['date'])
+        for comment in comments do 
+            comment['time_created'] = time_since_created(comment['date'])
+            comment['user_commented'] = select('users', 'id', comment['user_id'], 'username')[0]['username']
+        end
+        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments})
     end
-    user = select('users', 'id', result[0]['user_id'])
-    age = time_since_created(result[0]['date'])
-    slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age})
+end
+
+post('/create_comment') do
+    insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
+    path = '/post/view/' + params[:post_id].to_s
+    p params
+    redirect(path)
 end

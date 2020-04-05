@@ -10,9 +10,25 @@ div class="post_show"
         p = age
     br/
     - if info['content_image']
-        - path = "../../img/#{info['content_image']}.png"
+        - path = "/img/#{info['content_image']}.png"
         img src=path alt="Post image"/
     br/
 
     p = info['content_text']
+
+    p id ="create_comment_fold" Create a comment
+    div class="create_comment"
+        form action="/create_comment" method="post"
+            input type="hidden" name="post_id"
+            textarea# name="content" cols="30" rows="10" placeholder="Write your comment here..."
+            input type="submit" value="Create"/
+
+    div class="comments"
+        - comments.each do |comment|
+            div class="comment_head"
+                p = comment['time_created']
+                p = 'Commented by user ' + comment['user_commented']
+            div class="comment_body"
+                p = comment['content_text']
+
 
