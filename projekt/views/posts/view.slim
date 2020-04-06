@@ -28,6 +28,8 @@ div class="post_show"
             div class="comment_head"
                 p = comment['time_created']
                 p = 'Commented by user ' + comment['user_commented']
+                - if session[:user_id] == comment['user_commented_id']
+                    p id="comment_edit" edit comment
             div class="comment_body"
                 p = comment['content_text']
 

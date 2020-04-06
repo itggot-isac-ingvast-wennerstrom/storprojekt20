@@ -2,6 +2,7 @@ const create_comment_a = document.getElementById('create_comment_fold');
 const create_comment_form = document.querySelector(
 	'.post_show .create_comment'
 );
+const edit_comment_a = document.getElementById('comment_edit');
 
 create_comment_form.style.display = 'none';
 

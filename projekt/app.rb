@@ -143,7 +143,9 @@ get('/post/view/:post_id') do
         age = time_since_created(result[0]['date'])
         for comment in comments do 
             comment['time_created'] = time_since_created(comment['date'])
-            comment['user_commented'] = select('users', 'id', comment['user_id'], 'username')[0]['username']
+            user_result = select('users', 'id', comment['user_id'], 'username, id')[0]
+            comment['user_commented'] = user_result['username']
+            comment['user_commented_id'] = user_result['id']
         end
         slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments})
     end
