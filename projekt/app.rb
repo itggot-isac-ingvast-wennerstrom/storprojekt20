@@ -17,7 +17,7 @@ end
 #Checks if the user is logged in and it's authorization
 before do
     session[:error_msg] = ""
-    session[:user_id] = 3
+    session[:user_id] = 4
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -145,7 +145,6 @@ get('/post/view/:post_id') do
             comment['time_created'] = time_since_created(comment['date'])
             user_result = select('users', 'id', comment['user_id'], 'username, id')[0]
             comment['user_commented'] = user_result['username']
-            comment['user_commented_id'] = user_result['id']
         end
         slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments})
     end
@@ -154,6 +153,11 @@ end
 post('/create_comment') do
     insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
     path = '/post/view/' + params[:post_id].to_s
-    p params
     redirect(path)
+end
+
+post('/update_comment') do
+    update('comments', params[:comment_id], 'content_text', params[:comment])
+    path = '/post/view/' + params[:post_id].to_s
+    redirect(path) 
 end

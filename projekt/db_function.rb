@@ -123,3 +123,53 @@ def sign_in(username, password)
         return "wrong password"
     end
 end
+
+def update(table, id, elements, values, database_path='database/db.db')
+    #Connects to Database
+    db = connect_to_db(database_path)
+    #Checks if values is the same length as elements
+    is_arr = values.is_a?(Array)
+    num = 1
+    is_arr == elements.is_a?(Array) ? num = elements.length : (return nil)
+    #Creates a string of the attributes that will change and their values to '?'
+    #aswell as creating an array of things to update
+    param_str = ""
+    update = []
+    if is_arr
+        for i in 0...num do
+            param_str += elements[i].to_s + ' = ?,' 
+        end
+        param_str[-1] = " "
+        update = values + [id]
+    else
+        param_str = elements.to_s + ' = ?'
+        update = [values, id]
+    end
+    #Cases for different table types
+    case table
+    when 'users'
+        #Creates SQL String to execute
+        sql_str = 'UPDATE users SET ' + param_str + ' WHERE id = ?'
+        #Executes SQL String with the respective values
+        db.execute(sql_str, update)        
+    when 'posts'
+        #Creates SQL String to execute
+        sql_str = 'UPDATE posts SET ' + param_str + ' WHERE id = ?'
+        #Executes SQL String with the respective values
+        db.execute(sql_str, update)
+    when 'comments'
+        #Creates SQL String to execute
+        sql_str = 'UPDATE comments SET ' + param_str + ' WHERE id = ?'
+        #Executes SQL String with the respective values
+        p sql_str
+        p update
+        db.execute(sql_str, update)        
+    when 'genre'
+        #Creates SQL String to execute
+        sql_str = 'UPDATE genre SET ' + param_str + ' WHERE id = ?'
+        #Executes SQL String with the respective values
+        db.execute(sql_str, update)           
+    else 
+        session[:error_msg] = "SQL Error"
+    end
+end

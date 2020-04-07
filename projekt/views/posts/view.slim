@@ -28,8 +28,20 @@ div class="post_show"
             div class="comment_head"
                 p = comment['time_created']
                 p = 'Commented by user ' + comment['user_commented']
-                - if session[:user_id] == comment['user_commented_id']
-                    p id="comment_edit" edit comment
+                - if session[:user_id] == comment['user_id']
+                    p class="comment_edit" Edit comment
+            - if session[:user_id] == comment['user_id']
+                form action="/delete_comment" method="post" class="delete_comment_form"
+                    - comment_id = comment['id'].to_s; post_id = info['id'].to_s
+                    input type="hidden" name="comment_id" value=comment_id
+                    input type="hidden" name="post_id" value=post_id
+                    input type="submit" value="Delete comment"/
+                form action="/update_comment" method="post" class="update_comment_form"
+                    textarea# name="comment" cols="30" rows="10" = comment['content_text']
+                    input type="submit" value="Update"/
+                    - comment_id = comment['id'].to_s; post_id = info['id'].to_s
+                    input type="hidden" name="comment_id" value=comment_id
+                    input type="hidden" name="post_id" value=post_id
             div class="comment_body"
                 p = comment['content_text']
 
