@@ -1,6 +1,5 @@
 div class="post_show"
-    h1 = info['content_title']
-    
+    h1 class="post_title" = info['content_title']
     
     div class="post_info"
         p = "Points: " + info['points'].to_s
@@ -8,13 +7,31 @@ div class="post_show"
             p = "Post genres: " + info['genre']
         p = "Posted by user " + user['username']
         p = age
-    p = info['content_text']
+        - if session[:user_liked][info['id'].to_s] == (false || nil)
+            form action="/like_post" method="post"
+                - post_id = info['id'].to_s
+                input type="hidden" name="post_id"  value=post_id
+                input type="submit" value="hej" class="like_btn"/
+        - if session[:user_liked][info['id'].to_s] == true
+            form action="/unlike_post" method="post"
+                - post_id = info['id'].to_s
+                input type="hidden" name="post_id"  value=post_id
+                input type="submit" value="" class="unlike_btn"/
+    
+    p class="post_text" = info['content_text']
 
     br/
     - if info['content_image']
-        - path = "/img/#{info['content_image']}.png"
-        img src=path alt="Post image"/
+        - path = "/img/#{info['content_image']}"
+        img src=path alt="Post image" class="post_image"/
     br/
+
+    - if user[0] == session[:user_id]
+        p class="post_update" Edit post
+        form action="/update_post" method="post"
+            - post_id = info['id'].to_s
+            input type="hidden" name="post_id" value=post_id /
+            textarea# name="content_text" cols="30" rows="10" = info['content_text']
 
     p id ="create_comment_fold" Create a comment
     form action="/create_comment" method="post" class="create_comment"
@@ -30,12 +47,12 @@ div class="post_show"
                 p = 'Commented by user ' + comment['user_commented']
                 - if session[:user_id] == comment['user_id']
                     p class="comment_edit" Edit comment
+                    form action="/delete_comment" method="post" class="delete_comment_form"
+                        - comment_id = comment['id'].to_s; post_id = info['id'].to_s
+                        input type="hidden" name="comment_id" value=comment_id
+                        input type="hidden" name="post_id" value=post_id
+                        input type="submit" value="Delete comment"/
             - if session[:user_id] == comment['user_id']
-                form action="/delete_comment" method="post" class="delete_comment_form"
-                    - comment_id = comment['id'].to_s; post_id = info['id'].to_s
-                    input type="hidden" name="comment_id" value=comment_id
-                    input type="hidden" name="post_id" value=post_id
-                    input type="submit" value="Delete comment"/
                 form action="/update_comment" method="post" class="update_comment_form"
                     textarea# name="comment" cols="30" rows="10" = comment['content_text']
                     input type="submit" value="Update"/
@@ -44,5 +61,3 @@ div class="post_show"
                     input type="hidden" name="post_id" value=post_id
             div class="comment_body"
                 p = comment['content_text']
-
-

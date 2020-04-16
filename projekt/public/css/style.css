@@ -123,3 +123,13 @@
 	justify-content: center;
 	padding: 3rem;
 }
+
+.like_btn {
+	border: none;
+	background: url('/img/like.svg');
+	background-size: cover;
+	width: 2.5rem;
+	height: 2.5rem;
+	cursor: pointer;
+	color: transparent;
+}

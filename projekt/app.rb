@@ -4,10 +4,21 @@ require 'sqlite3'
 require 'bcrypt'
 
 #Loads documents with functions
-load 'functions.rb'
-load 'db_function.rb'
+require_relative './db_function.rb'
+require_relative './functions.rb'
 
+include DB_Functions
+include Server_Functions
+#Enables client sessions for instance data storage. 
 enable :sessions
+
+#Approved by Emil
+class Array
+    def difference(other)
+        h = other.each_with_object(Hash.new(0)) { |e,h| h[e] += 1 }
+        reject { |e| h[e] > 0 && h[e] -= 1 }
+    end
+end
 
 #Routes to Main 
 get('/') do
@@ -16,8 +27,9 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
+    session[:user_liked] = {}
     session[:error_msg] = ""
-    session[:user_id] = 4
+    session[:user_id] = 1
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -46,6 +58,7 @@ end
 
 #Post command that signs a user in to the website
 post('/sign_in_user') do
+    session[:user_liked] = {}
     result = sign_in(params[:username], params[:password])
     case result
     when 'wrong username'
@@ -130,7 +143,7 @@ post('/create_post_db') do
     redirect('/')    
 end
 
-get('/post/view/:post_id') do
+get('/post/:post_id') do
     num_str = "1234567890"
     params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
     result = select('posts', search ,params[:post_id])
@@ -158,6 +171,19 @@ end
 
 post('/update_comment') do
     update('comments', params[:comment_id], 'content_text', params[:comment])
+    path = '/post/view/' + params[:post_id].to_s
+    redirect(path) 
+end
+
+post('/delete_comment') do 
+    delete('comments', params[:comment_id])
+    path = '/post/view/' + params[:post_id].to_s
+    redirect(path) 
+end
+
+post('/like_post') do
+    session[:user_liked][params[:post_id]] = true
+    increment('posts', params[:post_id], 'points', 1)
     path = '/post/view/' + params[:post_id].to_s
     redirect(path) 
 end
