@@ -133,3 +133,13 @@
 	cursor: pointer;
 	color: transparent;
 }
+
+.unlike_btn {
+	border: none;
+	background: url('/img/like.svg') red;
+	background-size: cover;
+	width: 2.5rem;
+	height: 2.5rem;
+	cursor: pointer;
+	color: transparent;
+}

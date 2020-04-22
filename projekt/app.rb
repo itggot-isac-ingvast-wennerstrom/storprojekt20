@@ -138,8 +138,8 @@ end
 
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
-    id = image_to_dir(params[:image])
-    insert('posts', ['content_image', 'content_title', 'content_text', 'date', 'user_id'], [id, params[:title], params[:content_text], Time.now.to_i, session[:user_id]])
+    image_id = image_to_dir(params[:image])
+    insert('posts', ['content_image', 'content_title', 'content_text', 'date', 'user_id'], [image_id, params[:title], params[:content_text], Time.now.to_i, session[:user_id]])
     redirect('/')    
 end
 
@@ -159,31 +159,50 @@ get('/post/:post_id') do
             user_result = select('users', 'id', comment['user_id'], 'username, id')[0]
             comment['user_commented'] = user_result['username']
         end
-        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments})
+        userliked = session[:user_liked][params[:post_id]]
+        p session[:user_liked]
+        p session
+        p userliked
+        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments,userliked:userliked})
     end
 end
 
 post('/create_comment') do
     insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
-    path = '/post/view/' + params[:post_id].to_s
+    path = '/post/' + params[:post_id].to_s
     redirect(path)
 end
 
 post('/update_comment') do
-    update('comments', params[:comment_id], 'content_text', params[:comment])
-    path = '/post/view/' + params[:post_id].to_s
+    if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]
+        update('comments', params[:comment_id], 'content_text', params[:comment])
+    end
+    path = '/post/' + params[:post_id].to_s
     redirect(path) 
 end
 
 post('/delete_comment') do 
-    delete('comments', params[:comment_id])
-    path = '/post/view/' + params[:post_id].to_s
+    if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]
+        delete('comments', params[:comment_id])
+    end
+    path = '/post/' + params[:post_id].to_s
     redirect(path) 
 end
 
 post('/like_post') do
     session[:user_liked][params[:post_id]] = true
     increment('posts', params[:post_id], 'points', 1)
-    path = '/post/view/' + params[:post_id].to_s
+    path = '/post/' + params[:post_id].to_s
+    p session[:user_liked]
+    p session
     redirect(path) 
 end
+
+post('/unlike_post') do
+    session[:user_liked][params[:post_id]] = false
+    p session[:user_liked]
+    increment('posts', params[:post_id], 'points', -1)
+    path = '/post/' + params[:post_id].to_s
+    redirect(path) 
+end
+

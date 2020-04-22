@@ -7,16 +7,16 @@ div class="post_show"
             p = "Post genres: " + info['genre']
         p = "Posted by user " + user['username']
         p = age
-        - if session[:user_liked][info['id'].to_s] == (false || nil)
-            form action="/like_post" method="post"
-                - post_id = info['id'].to_s
-                input type="hidden" name="post_id"  value=post_id
-                input type="submit" value="hej" class="like_btn"/
-        - if session[:user_liked][info['id'].to_s] == true
+        -post_id = info['id'].to_s
+        - if userliked
             form action="/unlike_post" method="post"
-                - post_id = info['id'].to_s
                 input type="hidden" name="post_id"  value=post_id
                 input type="submit" value="" class="unlike_btn"/
+        - if !userliked
+            form action="/like_post" method="post"
+                input type="hidden" name="post_id"  value=post_id
+                input type="submit" value="hej" class="like_btn"/
+            
     
     p class="post_text" = info['content_text']
 
