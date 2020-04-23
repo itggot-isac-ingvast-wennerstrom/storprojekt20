@@ -48,7 +48,7 @@ module Server_Functions
         target = "public/img/#{filename}"
         #Writes file to target
         File.open(target, 'wb') {|f| f.write tempfile.read }
-        return id
+        return filename
     end 
 
     def time_since_created(time_created)

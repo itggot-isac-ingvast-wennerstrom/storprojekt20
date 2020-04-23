@@ -27,7 +27,9 @@ end
 
 #Checks if the user is logged in and it's authorization
 before do
-    session[:user_liked] = {}
+    if session[:user_liked] == nil
+        session[:user_liked] = {}
+    end
     session[:error_msg] = ""
     session[:user_id] = 1
     if session[:user_id] == nil
@@ -127,20 +129,40 @@ end
  
 #Test routes for different functions 
 get('/test') do 
-    result = select('users', 'username', 'hur')
-    p result
-    slim(:test,locals:{result:result})
+    genres = select_all('genre', 'id')
+    p genres
+    p genres.length
+    slim(:test)
 end
 
 get('/post/create') do
-    slim(:'/posts/create')
+    genres = select('genre')
+    slim(:'/posts/create',locals:{genres:genres})
 end
 
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
-    image_id = image_to_dir(params[:image])
+    while true
+        image_id = image_to_dir(params[:image])
+        if select('posts', 'content_image', image_id) == []
+            break
+        end
+    end
     insert('posts', ['content_image', 'content_title', 'content_text', 'date', 'user_id'], [image_id, params[:title], params[:content_text], Time.now.to_i, session[:user_id]])
-    redirect('/')    
+    post_id = select('posts', 'content_image', image_id, 'id')[0]
+    genres = select_all('genre', 'id')
+    p genres
+    p params
+    ids = [] 
+    genres.each do |genre|
+        if params[genre['id'].to_s] != nil
+            ids << genre['id']
+        end
+    end
+    ids.each do |id| 
+        genre_post_link('insert', post_id['id'], id)
+    end
+    redirect('/')
 end
 
 get('/post/:post_id') do
@@ -160,11 +182,9 @@ get('/post/:post_id') do
             comment['user_commented'] = user_result['username']
         end
         userliked = session[:user_liked][params[:post_id]]
-        p session[:user_liked]
-        p session
-        p userliked
-        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments,userliked:userliked})
-    end
+        genres = get_genres_for_post(params[:post_id].to_i)
+        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments,userliked:userliked,genres:genres})
+    end     
 end
 
 post('/create_comment') do
@@ -174,7 +194,7 @@ post('/create_comment') do
 end
 
 post('/update_comment') do
-    if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]
+    if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]['user_id']
         update('comments', params[:comment_id], 'content_text', params[:comment])
     end
     path = '/post/' + params[:post_id].to_s
@@ -182,7 +202,9 @@ post('/update_comment') do
 end
 
 post('/delete_comment') do 
-    if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]
+    comment_result = select('comments', 'id', params[:comment_id], 'user_id')[0]
+    user_role = select('users', 'id', session[:user_id], 'role')[0]
+    if session[:user_id] == comment_result['user_id'] || user_role['role'] = 'admin'
         delete('comments', params[:comment_id])
     end
     path = '/post/' + params[:post_id].to_s
@@ -193,16 +215,12 @@ post('/like_post') do
     session[:user_liked][params[:post_id]] = true
     increment('posts', params[:post_id], 'points', 1)
     path = '/post/' + params[:post_id].to_s
-    p session[:user_liked]
-    p session
     redirect(path) 
 end
 
 post('/unlike_post') do
     session[:user_liked][params[:post_id]] = false
-    p session[:user_liked]
     increment('posts', params[:post_id], 'points', -1)
     path = '/post/' + params[:post_id].to_s
     redirect(path) 
 end
-

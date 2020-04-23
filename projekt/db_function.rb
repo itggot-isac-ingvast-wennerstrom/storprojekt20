@@ -18,10 +18,17 @@ module DB_Functions
     end
 
     #Constructs and executes a SELECT command in SQL
-    def select(table, search, search_values, elements='*', database_path='database/db.db')
+    def select(table, search="", search_values="", elements='*', database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
         #Checks if search_values is the same length as search
+        if search.empty? 
+            !(search_values.empty?) ? session[:error_msg] = 'SQL Error' : false
+            sql_str = 'SELECT * FROM ' + table
+            return db.execute(sql_str)
+        else
+           # search_values.empty? ? session[:error_msg] = 'SQL Error' : false
+        end
         if search.is_a?(Array) != search_values.is_a?(Array)
             session[:error_msg] = "SQL Error"
             return []
@@ -207,21 +214,48 @@ module DB_Functions
         #Creates incrementing SQL string
         sql_str = value + ' = '+ value + ' + ' + inc.to_s 
         #Cases for different table types
+        p sql_str
         case table
         when 'users'
             #Executes SQL with the respective values
             db.execute('UPDATE users SET ' + sql_str + ' WHERE id = ?', id)        
         when 'posts'
             #Executes SQL with the respective values
-            db.execute('UPDATE users SET ' + sql_str + ' WHERE id = ?', id)        
+            db.execute('UPDATE posts SET ' + sql_str + ' WHERE id = ?', id)        
         when 'comments'
             #Executes SQL with the respective values
-            db.execute('UPDATE users SET ' + sql_str + ' WHERE id = ?', id)        
+            db.execute('UPDATE comments SET ' + sql_str + ' WHERE id = ?', id)        
         when 'genre'
             #Executes SQL with the respective values
-            db.execute('UPDATE users SET ' + sql_str + ' WHERE id = ?', id)        
+            db.execute('UPDATE genre SET ' + sql_str + ' WHERE id = ?', id)        
         else 
             session[:error_msg] = "SQL Error"
         end
     end
+
+    def genre_post_link(table_do, post_id, genre_id)
+        db = connect_to_db('database/db.db')
+
+        case table_do
+        when 'insert'
+            db.execute('INSERT INTO genre_post_link VALUES (?,?)', [post_id, genre_id])
+        when 'delete'
+            db.execute('DELETE FROM genre_post_link WHERE (post_id, genre_id) = (?,?)', [post_id, genre_id])
+        when 'select_post'
+            return db.execute('SELECT * FROM genre_post_link WHERE post_id = ?', post_id)
+        when 'select_genre'
+            return db.execute('SELECT * FROM genre_post_link WHERE genre_id = ?', genre_id)
+        end
+    end
+
+    def select_all(table, elements='*', database_path='database/db.db')
+        db = connect_to_db(database_path)
+        return db.execute('SELECT ' + elements + ' FROM ' + table)
+    end
+
+    def get_genres_for_post(post_id, database_path='database/db.db')
+        db = connect_to_db(database_path)
+        return db.execute('SELECT * FROM genre WHERE id IN (SELECT genre_id FROM genre_post_link WHERE post_id = ?)', post_id)
+    end
 end
+

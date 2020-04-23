@@ -34,7 +34,7 @@
 .post_show .post_info {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: space-evenly;
 	width: 40vw;
 }
 
@@ -142,4 +142,15 @@
 	height: 2.5rem;
 	cursor: pointer;
 	color: transparent;
+}
+.post_image {
+	max-width: 90vw;
+	max-height: 70vh;
+}
+
+.genre_display {
+	min-width: 40vw;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
 }

@@ -2,6 +2,13 @@ form action="/create_post_db" method="post" enctype="multipart/form-data"
     input# type="text" name="title" placeholder="Post title"/
     input# type="text" name="content_text" placeholder="Content text"/
     input# type="file" name="image" accept="image/*"/
-    
+    fieldset
+        legend Genres
+        - genres.each do |genre| 
+            - title = genre['title']
+            - id = genre['id']
+            input# type="checkbox" name=id value=title
+            label for=id = title
+            
     input type="submit" value="Create Post"/
-
+    
