@@ -398,7 +398,7 @@ post('/search_post_id') do
         session[:error_msg] = "No posts with that id exists"
         redirect('/')
     else
-        path = '/post/' + params[:id].to_s
+        path = '/post/' + params[:info].to_s
         redirect(path)
     end
     redirect('/')

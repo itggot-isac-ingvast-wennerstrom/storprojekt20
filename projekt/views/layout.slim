@@ -12,6 +12,8 @@ html lang="en"
             a href="/" Home
             a href="#" Discover
             
+            a href="/post/create" Create a post
+
             div class="login_container"
                 - if session[:user_id] == nil
                     a href="/sign_in" id="sign_in" Sign in

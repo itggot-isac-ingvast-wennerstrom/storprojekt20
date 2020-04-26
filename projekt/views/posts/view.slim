@@ -51,7 +51,7 @@ div class="post_show"
             input type="submit" value="Edit"/
             input type="submit" value="Delete Post" formaction="/delete_post" /
 
-    p id ="create_comment_fold" Create a comment
+    p id="create_comment_fold" Create a comment
     form action="/create_comment" method="post" class="create_comment"
         - post_id = info['id'].to_s
         input type="hidden" name="post_id"  value=post_id
