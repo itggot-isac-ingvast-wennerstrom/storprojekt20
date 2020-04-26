@@ -3,8 +3,7 @@ require 'slim'
 require 'sinatra'
 require 'bcrypt'
 
-# require_relative './functions.rb'
-# include Server_Functions
+# All the functions that interact with the database
 
 module DB_Functions
     
@@ -146,6 +145,7 @@ module DB_Functions
     def sign_in(username, password)
         result = select('users', 'username',params[:username])
         #Checks if there's a user with that username
+        p result
         if result == []
             return 'wrong username'
         end

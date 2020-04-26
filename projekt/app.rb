@@ -32,7 +32,6 @@ before do
     if session[:user_liked] == nil
         session[:user_liked] = {}
     end
-    session[:error_msg] = ""
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -52,7 +51,9 @@ before do
     end
 end 
 
+
 # Displays a sign in form
+#
 get('/sign_in') do
     slim(:'user/sign_in')
 end
@@ -69,17 +70,17 @@ post('/sign_in_user') do
     case result
     when 'wrong username'
         session[:error_msg] = "No user with that username"
-        break
     when 'wrong password'
         session[:error_msg] = "Password is wrong"
-        break
     else
+        p result
         session[:user_id] = result
-        redirect('/')
     end
+    redirect('/')
 end
 
-# Displays a Sign up form  
+# Displays a Sign up form 
+# 
 get('/sign_up') do
     slim(:'user/create_user')
 end
@@ -161,10 +162,10 @@ end
 # @param [String] content_text The text that is displayed below the title
 # @param [File] image The image that is uploaded to the website
 #
-# @see DB_Function#select
-# @see DB_Function#insert
-# @see DB_Function#select_all
-# @see DB_Function#genre_post_link
+# @see DB_Functions#select
+# @see DB_Functions#insert
+# @see DB_Functions#select_all
+# @see DB_Functions#genre_post_link
 # @see Server_Functions#image_to_dir 
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
@@ -193,9 +194,9 @@ end
 #
 # @param [String] post_id The id for the selected post
 #
-# @see DB_Function#select
-# @see DB_Function#select_all
-# @see DB_Function#get_genres_for_post
+# @see DB_Functions#select
+# @see DB_Functions#select_all
+# @see DB_Functions#get_genres_for_post
 # @see Server_Functions#time_since_created
 get('/post/:post_id') do
     num_str = "1234567890"
@@ -226,7 +227,7 @@ end
 # @param [String] user_id The id of the user that creates the comment
 # @param [String] content The text that the comment contains
 #
-# @see DB_Function#insert
+# @see DB_Functions#insert
 post('/create_comment') do
     insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
     path = '/post/' + params[:post_id].to_s
@@ -239,8 +240,8 @@ end
 # @param [String] comment The new text for the comment
 # @param [String] post_id The post_id that the comment is attached to
 #
-# @see DB_Function#update
-# @see DB_Function#select
+# @see DB_Functions#update
+# @see DB_Functions#select
 post('/update_comment') do
     if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]['user_id']
         update('comments', params[:comment_id], 'content_text', params[:comment])
@@ -254,8 +255,8 @@ end
 # @param [String] comment_id The id of the comment that should gets deleted
 # @param [String] post_id The post_id that the comment was attached to
 #
-# @see DB_Function#select
-# @see DB_Function#delete
+# @see DB_Functions#select
+# @see DB_Functions#delete
 post('/delete_comment') do 
     comment_result = select('comments', 'id', params[:comment_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
@@ -270,7 +271,7 @@ end
 #
 # @param [String] post_id The id of the post that gets liked
 # 
-# @see DB_Function#increment
+# @see DB_Functions#increment
 post('/like_post') do
     session[:user_liked][params[:post_id]] = true
     increment('posts', params[:post_id], 'points', 1)
@@ -282,7 +283,7 @@ end
 #
 # @param [String] post_id The id of the post that gets unliked
 #
-# @see DB_Function#increment
+# @see DB_Functions#increment
 post('/unlike_post') do
     session[:user_liked][params[:post_id]] = false
     increment('posts', params[:post_id], 'points', -1)
@@ -296,10 +297,10 @@ end
 # @param [String] title The new title of the post
 # @param [String] content_text The new text for the post
 # 
-# @see DB_Function#update
-# @see DB_Function#select
-# @see DB_Function#genre_post_link
-# @see DB_Function#select_all
+# @see DB_Functions#update
+# @see DB_Functions#select
+# @see DB_Functions#genre_post_link
+# @see DB_Functions#select_all
 post('/update_post') do
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
@@ -342,8 +343,8 @@ end
 #
 # @param [String] post_id The id of the post that gets deleted
 #
-# @see DB_Function#delete
-# @see DB_Function#select
+# @see DB_Functions#delete
+# @see DB_Functions#select
 post('/delete_post') do 
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
@@ -353,3 +354,52 @@ post('/delete_post') do
     redirect('/')
 end
 
+# Searches for users using their username
+#
+# @param [String] username The username being used for the search
+#
+# @see DB_Functions#select
+post('/search_user') do 
+    result = select('users', 'username', params[:username], 'id')
+    if result == []
+        session[:error_msg] = "No user exists with that username"
+        redirect('/')
+    else
+        path = '/profile/' + params[:username]
+        redirect(path)
+    end
+end
+
+# Searches after posts with their title
+#
+# @param [String] info The title that is being used for the search
+#
+# @see DB_Functions#select
+post('/search_post') do
+    result = select('posts', 'content_title', params[:info], 'id')
+    if result == []
+        session[:error_msg] = "There is no post with that title"
+        redirect('/')
+    else
+        id = result[0]['id']
+        path = '/post/' + id.to_s
+        redirect(path)
+    end
+end
+
+# Searches after posts with their id:s
+#
+# @param [String] info The id being used in the search
+#
+# @see DB_Functions#select
+post('/search_post_id') do
+    result = select('posts', 'id', params[:info])
+    if result == []
+        session[:error_msg] = "No posts with that id exists"
+        redirect('/')
+    else
+        path = '/post/' + params[:id].to_s
+        redirect(path)
+    end
+    redirect('/')
+end

@@ -1,5 +1,7 @@
 require 'fileutils'
 
+# All the functions that are used in app.rb or DB_Function but are not suitable to be included in either of them
+
 module Server_Functions
     #Validates email given an input string
     #

@@ -11,12 +11,13 @@ html lang="en"
         nav class="head_nav"
             a href="/" Home
             a href="#" Discover
-            form action="/main_search" method="get"
-                input# type="text" name="search" class="search_bar"/
-                input type="submit" value="Go" class="search_btn"/
+            
             div class="login_container"
-                a href="/sign_in" id="sign_in" Sign in
-                a href="/sign_up" id="sign_up" Sign up
+                - if session[:user_id] == nil
+                    a href="/sign_in" id="sign_in" Sign in
+                    a href="/sign_up" id="sign_up" Sign up
+                - else
+                    a href="/profile" Your profile
     
     ==yield
 

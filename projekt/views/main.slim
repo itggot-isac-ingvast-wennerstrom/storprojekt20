@@ -1,12 +1,12 @@
-p = session[:error_msg]
-
 h1 Welcome to Memegur
 
-form action="/search_user" method="get"
+p = session[:error_msg]
+
+form action="/search_user" method="post"
     input# type="text" name="username" placeholder="Enter the username here"/
     input type="submit" value="Search"/
 
-form action="/search_post" method="get"
-    input# type="text" name="title" placeholder="Enter the information here"/
+form action="/search_post" method="post"
+    input# type="text" name="info" placeholder="Enter the information here"/
     input type="submit" value="Search with ID" formaction="/search_post_id"/
     input type="submit" value="Search with title"/
