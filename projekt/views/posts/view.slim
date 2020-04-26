@@ -36,8 +36,19 @@ div class="post_show"
         form action="/update_post" method="post" class="update_form"
             - post_id = info['id'].to_s
             input type="hidden" name="post_id" value=post_id /
-            input# type="text" name="title"/
+            input# type="text" name="title" value=info['content_title']
             textarea# name="content_text" cols="30" rows="10" = info['content_text']
+            fieldset
+                legend Genres
+                - genres_selected = []; genres.each {|genre| genres_selected << genre['title']}
+                - edit_genres.each do |genre| 
+                    - title = genre['title']
+                    - id = genre['id']
+                    - included = false
+                    - genres_selected.each {|title| title == genre['title'] ? included = true : false}
+                    input# type="checkbox" name=id value=title checked=included
+                    label for=id = title
+            input type="submit" value="Edit"/
 
     p id ="create_comment_fold" Create a comment
     form action="/create_comment" method="post" class="create_comment"

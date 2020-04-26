@@ -136,7 +136,7 @@ get('/test') do
 end
 
 get('/post/create') do
-    genres = select('genre')
+    genres = select_all('genre')
     slim(:'/posts/create',locals:{genres:genres})
 end
 
@@ -151,8 +151,6 @@ post('/create_post_db') do
     insert('posts', ['content_image', 'content_title', 'content_text', 'date', 'user_id'], [image_id, params[:title], params[:content_text], Time.now.to_i, session[:user_id]])
     post_id = select('posts', 'content_image', image_id, 'id')[0]
     genres = select_all('genre', 'id')
-    p genres
-    p params
     ids = [] 
     genres.each do |genre|
         if params[genre['id'].to_s] != nil
@@ -183,8 +181,9 @@ get('/post/:post_id') do
         end
         userliked = session[:user_liked][params[:post_id]]
         genres = get_genres_for_post(params[:post_id].to_i)
-        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments,userliked:userliked,genres:genres})
-    end     
+        edit_genres = select_all('genre')
+        slim(:'/posts/view', locals:{info:result[0],user:user[0],age:age,comments:comments,userliked:userliked,genres:genres,edit_genres:edit_genres})
+    end
 end
 
 post('/create_comment') do
@@ -223,4 +222,42 @@ post('/unlike_post') do
     increment('posts', params[:post_id], 'points', -1)
     path = '/post/' + params[:post_id].to_s
     redirect(path) 
+end
+
+post('/update_post') do
+    post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
+    user_role = select('users', 'id', session[:user_id], 'role')[0]
+    if session[:user_id] == post_result['user_id'] || user_role['role'] = 'admin'
+        element_arr =  ['content_title', 'content_text']
+        val_arr = [params[:title], params[:content_text]]
+        update('posts', params['post_id'], element_arr, val_arr)
+        genres_existing = genre_post_link('select_post', params[:post_id])
+        i = 0
+        while i < genres_existing.length
+            genres_existing[i] = genres_existing[i]['genre_id']
+            i += 1
+        end
+        genres = select_all('genre', 'id')
+        i = 0 
+        while i < genres.length
+            genres[i] = genres[i]['id']
+            i += 1
+        end
+        ids = []
+        genres.each do |genre_id|
+            if params[genre_id.to_s] != nil
+                ids << genre_id
+            end
+        end
+        remove = genres_existing - ids
+        remove.each do |rem|
+            genre_post_link('delete', params[:post_id], rem)
+        end
+        add = ids - genres_existing
+        add.each do |ads|
+            genre_post_link('insert', params[:post_id], ads)
+        end
+    end
+    path = '/post/' + params[:post_id]
+    redirect(path)
 end

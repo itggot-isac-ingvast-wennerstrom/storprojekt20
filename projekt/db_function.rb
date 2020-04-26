@@ -18,7 +18,7 @@ module DB_Functions
     end
 
     #Constructs and executes a SELECT command in SQL
-    def select(table, search="", search_values="", elements='*', database_path='database/db.db')
+    def select(table, search, search_values, elements='*', database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
         #Checks if search_values is the same length as search
@@ -139,7 +139,7 @@ module DB_Functions
     def update(table, id, elements, values, database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
-        #Checks if values is the same length as elements
+        #Checks if both elements and values are arrays
         is_arr = values.is_a?(Array)
         num = 1
         is_arr == elements.is_a?(Array) ? num = elements.length : (return nil)
@@ -151,12 +151,13 @@ module DB_Functions
             for i in 0...num do
                 param_str += elements[i].to_s + ' = ?,' 
             end
-            param_str[-1] = " "
+            param_str[-1] = ""
             update = values + [id]
         else
             param_str = elements.to_s + ' = ?'
             update = [values, id]
         end
+
         #Cases for different table types
         case table
         when 'users'
@@ -168,8 +169,6 @@ module DB_Functions
             #Creates SQL String to execute
             sql_str = 'UPDATE posts SET ' + param_str + ' WHERE id = ?'
             #Executes SQL String with the respective values
-            p sql_str
-            p update
             db.execute(sql_str, update)
         when 'comments'
             #Creates SQL String to execute
@@ -233,9 +232,11 @@ module DB_Functions
         end
     end
 
-    def genre_post_link(table_do, post_id, genre_id)
+    def genre_post_link(table_do, post_id=nil, genre_id=nil)
         db = connect_to_db('database/db.db')
-
+        if post_id == nil && genre_id == nil
+            return nil
+        end
         case table_do
         when 'insert'
             db.execute('INSERT INTO genre_post_link VALUES (?,?)', [post_id, genre_id])
