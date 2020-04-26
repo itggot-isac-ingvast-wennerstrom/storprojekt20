@@ -20,18 +20,19 @@ class Array
     end
 end
 
-#Routes to Main 
+# Display Landing Page
+#
 get('/') do
     slim(:home)
 end
 
 #Checks if the user is logged in and it's authorization
+#
 before do
     if session[:user_liked] == nil
         session[:user_liked] = {}
     end
     session[:error_msg] = ""
-    session[:user_id] = 1
     if session[:user_id] == nil
         case request.path_info
         when '/'
@@ -44,8 +45,6 @@ before do
             break
         when '/sign_up'
             break
-        when '/test'
-            break
         else
             session[:error_msg] = "You must be logged in to acess this"
             redirect('/sign_in')
@@ -53,12 +52,17 @@ before do
     end
 end 
 
-#Routes to Sign_in
+# Displays a sign in form
 get('/sign_in') do
     slim(:'user/sign_in')
 end
 
-#Post command that signs a user in to the website
+# Attempts Login and updates the session
+#
+# @param [String] username, The username
+# @param [String] password, The password
+#
+# @see DB_Functions#sign_in
 post('/sign_in_user') do
     session[:user_liked] = {}
     result = sign_in(params[:username], params[:password])
@@ -75,12 +79,20 @@ post('/sign_in_user') do
     end
 end
 
-#Routes to Sign_up  
+# Displays a Sign up form  
 get('/sign_up') do
     slim(:'user/create_user')
 end
 
-#Post that creates a user
+# Attempts to create a new user and updates session
+#
+# @param [String] username, The username
+# @param [String] password, The password 
+# @param [String] password_conf, The password confirmation
+# @param [String] email, The selected email adress for the user
+# 
+# @see DB_Functions#select
+# @see DB_Functions#insert
 post('/create_user') do
     if params[:password] != params[:password_conf] #Checking if passwords match
         session[:error_msg] = "Passwords do not match"
@@ -105,12 +117,17 @@ post('/create_user') do
     end
 end
 
-#Routes to new_user_registred
+# Displays a welcome page
+#
 get('/new_user_registred') do
     slim(:'user/new_user_reg')
 end
 
-#Restful route to the selected users profile
+# Displays a single profile
+#
+# @param [String] username, The username of the profile that should be viewed
+#
+# @see DB_Functions#select
 get('/profile/:username') do
     result = select('users', 'username', params[:username])
     if session[:user_id] == result[0]['id']
@@ -121,25 +138,33 @@ get('/profile/:username') do
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
-#Look at your own profile
+# Displays the logged in users profile
+#
+# @see DB_Functions#select
 get('/profile') do
     result = select('users', 'id', session[:user_id])
     slim(:'user/profile',locals:{profile:result[0],is_user:true})
 end
- 
-#Test routes for different functions 
-get('/test') do 
-    genres = select_all('genre', 'id')
-    p genres
-    p genres.length
-    slim(:test)
-end
 
+# Displays a form for creating a post
+#
+# @see DB_Functions#select_all
 get('/post/create') do
     genres = select_all('genre')
     slim(:'/posts/create',locals:{genres:genres})
 end
 
+# Attempts to create a post
+#
+# @param [String] title, The title for the post
+# @param [String] content_text, The text that is displayed below the title
+# @param [File] image, The image that is uploaded to the website
+#
+# @see DB_Function#select
+# @see DB_Function#insert
+# @see DB_Function#select_all
+# @see DB_Function#genre_post_link
+# @see Server_Functions#image_to_dir 
 post('/create_post_db') do
     #calls image_to_dir function from function.rb
     while true
@@ -260,4 +285,13 @@ post('/update_post') do
     end
     path = '/post/' + params[:post_id]
     redirect(path)
+end
+
+post('/delete_post') do 
+    post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
+    user_role = select('users', 'id', session[:user_id], 'role')[0]
+    if session[:user_id] == post_result['user_id'] || user_role['role'] = 'admin'
+        delete('posts', params[:post_id])
+    end
+    redirect('/')
 end
