@@ -305,7 +305,7 @@ module DB_Functions
     # Selects all entries and their field values in a table
     #
     # @param [String] table The table that the command deletes from
-    # @param [String] elemements The elements that gets selected from every entry.
+    # @param [String] elements The elements that gets selected from every entry.
     # @param [String] database_path The path for the database that the table exists in
     #
     # @return [Array] 

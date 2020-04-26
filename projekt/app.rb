@@ -23,7 +23,7 @@ end
 # Display Landing Page
 #
 get('/') do
-    slim(:home)
+    slim(:main)
 end
 
 #Checks if the user is logged in and it's authorization
@@ -59,8 +59,8 @@ end
 
 # Attempts Login and updates the session
 #
-# @param [String] username, The username
-# @param [String] password, The password
+# @param [String] username The username
+# @param [String] password The password
 #
 # @see DB_Functions#sign_in
 post('/sign_in_user') do
@@ -86,10 +86,10 @@ end
 
 # Attempts to create a new user and updates session
 #
-# @param [String] username, The username
-# @param [String] password, The password 
-# @param [String] password_conf, The password confirmation
-# @param [String] email, The selected email adress for the user
+# @param [String] username The username
+# @param [String] password The password 
+# @param [String] password_conf The password confirmation
+# @param [String] email The selected email adress for the user
 # 
 # @see DB_Functions#select
 # @see DB_Functions#insert
@@ -126,7 +126,7 @@ end
 
 # Displays a single profile
 #
-# @param [String] username, The username of the profile that should be viewed
+# @param [String] username The username of the profile that should be viewed
 #
 # @see DB_Functions#select
 get('/profile/:username') do
@@ -157,9 +157,9 @@ end
 
 # Attempts to create a post
 #
-# @param [String] title, The title for the post
-# @param [String] content_text, The text that is displayed below the title
-# @param [File] image, The image that is uploaded to the website
+# @param [String] title The title for the post
+# @param [String] content_text The text that is displayed below the title
+# @param [File] image The image that is uploaded to the website
 #
 # @see DB_Function#select
 # @see DB_Function#insert
@@ -191,7 +191,7 @@ end
 
 # Displays a post
 #
-# @param [String] post_id, The id for the selected post
+# @param [String] post_id The id for the selected post
 #
 # @see DB_Function#select
 # @see DB_Function#select_all
@@ -222,9 +222,9 @@ end
 
 # Creates a comment on a post
 #
-# @param [String] post_id, The post id that the comment is created for
-# @param [String] user_id, The id of the user that creates the comment
-# @param [String] content, The text that the comment contains
+# @param [String] post_id The post id that the comment is created for
+# @param [String] user_id The id of the user that creates the comment
+# @param [String] content The text that the comment contains
 #
 # @see DB_Function#insert
 post('/create_comment') do
@@ -235,9 +235,9 @@ end
 
 # Attempts to update a comment
 #
-# @param [String] comment_id, The id of the comment that should update
-# @param [String] comment, The new text for the comment
-# @param [String] post_id, The post_id that the comment is attached to
+# @param [String] comment_id The id of the comment that should update
+# @param [String] comment The new text for the comment
+# @param [String] post_id The post_id that the comment is attached to
 #
 # @see DB_Function#update
 # @see DB_Function#select
@@ -251,8 +251,8 @@ end
 
 # Attempts to delete a comment
 #
-# @param [String] comment_id, The id of the comment that should gets deleted
-# @param [String] post_id, The post_id that the comment was attached to
+# @param [String] comment_id The id of the comment that should gets deleted
+# @param [String] post_id The post_id that the comment was attached to
 #
 # @see DB_Function#select
 # @see DB_Function#delete
@@ -268,7 +268,7 @@ end
 
 # Likes a post and updates session
 #
-# @param [String] post_id, The id of the post that gets liked
+# @param [String] post_id The id of the post that gets liked
 # 
 # @see DB_Function#increment
 post('/like_post') do
@@ -280,7 +280,7 @@ end
 
 # Unlikes a post and updates session
 #
-# @param [String] post_id, The id of the post that gets unliked
+# @param [String] post_id The id of the post that gets unliked
 #
 # @see DB_Function#increment
 post('/unlike_post') do
@@ -292,9 +292,9 @@ end
 
 # Updates a post
 #
-# @param [String] post_id, The id of the post that gets updated
-# @param [String] title, The new title of the post
-# @param [String] content_text, The new text for the post
+# @param [String] post_id The id of the post that gets updated
+# @param [String] title The new title of the post
+# @param [String] content_text The new text for the post
 # 
 # @see DB_Function#update
 # @see DB_Function#select
@@ -340,7 +340,7 @@ end
 
 # Attempts to delete a post
 #
-# @param [String] post_id, The id of the post that gets deleted
+# @param [String] post_id The id of the post that gets deleted
 #
 # @see DB_Function#delete
 # @see DB_Function#select
@@ -352,3 +352,4 @@ post('/delete_post') do
     end
     redirect('/')
 end
+
