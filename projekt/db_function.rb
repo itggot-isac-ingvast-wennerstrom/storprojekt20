@@ -11,6 +11,10 @@ module DB_Functions
     require_relative './functions.rb'
     include Server_Functions
     #Connects to the disered database
+    #
+    # @param [String] path The path for the database
+    #
+    # @return [Database] The database that is referenced
     def connect_to_db(path) #path is a string
         db = SQLite3::Database.new(path)
         db.results_as_hash = true
@@ -18,6 +22,14 @@ module DB_Functions
     end
 
     #Constructs and executes a SELECT command in SQL
+    #
+    # @param [String] table The table that the command selects from
+    # @param [String] search The parameters that are used to select data
+    # @param [String] search_values The requested values for the search parameters
+    # @param [String] elements The elements that gets selected.
+    # @param [String] database_path The path to the database that the command selects from.
+    #
+    # @return [Array] The result from the select command. Contains the data as hashes
     def select(table, search, search_values, elements='*', database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
@@ -80,6 +92,11 @@ module DB_Functions
     end
 
     #Constructs and executes an INSERT command in SQL
+    #
+    # @param [String] table The table that the command inserts into
+    # @param [Array] elements The elements that gets inserted
+    # @param [Array] values The corresponding values that gets inserted for the elements
+    # @param [String] database_path The path for the database that the command execute on
     def insert(table, elements, values, database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
@@ -122,6 +139,10 @@ module DB_Functions
         end
     end
 
+    # Signs a user into the website and updates the session
+    #
+    # @param [String] username The username used for the login
+    # @param [String] password The password used for the login
     def sign_in(username, password)
         result = select('users', 'username',params[:username])
         #Checks if there's a user with that username
@@ -136,6 +157,13 @@ module DB_Functions
         end
     end
 
+    # Updates a entry into the database
+    #
+    # @param [String] table The table that the command updates from
+    # @param [String] id The id for the entry that gets updated
+    # @param [Array] elements The elements that gets updated
+    # @param [Array] values The values for the corresponding elements
+    # @param [String] database_path The path for the database that the command executes on
     def update(table, id, elements, values, database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
@@ -185,6 +213,11 @@ module DB_Functions
         end
     end
 
+    # Deletes an entry in a database
+    #
+    # @param [String] table The table that the command deletes from
+    # @param [String] id The id for the entry that gets deleted
+    # @param [String] database_path The path for the database that the command gets executed on
     def delete(table, id, database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
@@ -207,6 +240,13 @@ module DB_Functions
         end
     end
 
+    # Increments a point value in an entry
+    #
+    # @param [String] table The table that the command updates on
+    # @param [String] id The id for the entry that the command updates
+    # @param [String] value The field that gets updated
+    # @param [Integer] inc The value that the field gets incremented with
+    # @param [String] database_path The path for the database that the command executes on
     def increment(table, id, value, inc, database_path='database/db.db')
         #Connects to Database
         db = connect_to_db(database_path)
@@ -232,6 +272,19 @@ module DB_Functions
         end
     end
 
+    # SQL commands for the Genre and Post link table
+    #
+    # @param [String] table_do The selected option for the different types of command that can get chosen
+    # @option table_do [String] insert Insert command for the genre_post_link table
+    # @option table_do [String] delete Delete command for the genre_post_link table
+    # @option table_do [String] select_post Select command for the genre_post_link table using the post_id
+    # @option table_do [String] select_genre Select command for the genre_post_link table using the genre_id
+    # @param [String] post_id The value for the post_id for the select_post command. 
+    # @param [String] genre_id The value for the genre_id for the select_genre command. 
+    #
+    # @return [Array] 
+    #   * :nil If the command insert or delete is used the Array is empty
+    #   * :value_array If the command select_post or select_genre is used returns the values of that entry
     def genre_post_link(table_do, post_id=nil, genre_id=nil)
         db = connect_to_db('database/db.db')
         if post_id == nil && genre_id == nil
@@ -248,12 +301,27 @@ module DB_Functions
             return db.execute('SELECT * FROM genre_post_link WHERE genre_id = ?', genre_id)
         end
     end
-
+    
+    # Selects all entries and their field values in a table
+    #
+    # @param [String] table The table that the command deletes from
+    # @param [String] elemements The elements that gets selected from every entry.
+    # @param [String] database_path The path for the database that the table exists in
+    #
+    # @return [Array] 
+    #   * :entry [Hash] A Hash of all the fields with their values
     def select_all(table, elements='*', database_path='database/db.db')
         db = connect_to_db(database_path)
         return db.execute('SELECT ' + elements + ' FROM ' + table)
     end
 
+    # Gets the genres for a post using a nested SQL command
+    #
+    # @param [String] post_id The post_id used for the selection
+    # @param [String] database_path The path for the database that the command executes on
+    #
+    # @return [Array]
+    #   * :entry [Array] an array of hashes for that entry in the genre table 
     def get_genres_for_post(post_id, database_path='database/db.db')
         db = connect_to_db(database_path)
         return db.execute('SELECT * FROM genre WHERE id IN (SELECT genre_id FROM genre_post_link WHERE post_id = ?)', post_id)

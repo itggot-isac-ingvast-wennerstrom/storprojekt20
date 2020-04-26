@@ -93,6 +93,7 @@ end
 # 
 # @see DB_Functions#select
 # @see DB_Functions#insert
+# @see Server_Functions#validate_email
 post('/create_user') do
     if params[:password] != params[:password_conf] #Checking if passwords match
         session[:error_msg] = "Passwords do not match"
@@ -188,6 +189,14 @@ post('/create_post_db') do
     redirect('/')
 end
 
+# Displays a post
+#
+# @param [String] post_id, The id for the selected post
+#
+# @see DB_Function#select
+# @see DB_Function#select_all
+# @see DB_Function#get_genres_for_post
+# @see Server_Functions#time_since_created
 get('/post/:post_id') do
     num_str = "1234567890"
     params[:post_id].chars.difference(num_str.chars).empty? ? search = 'id' : search = 'content_image'
@@ -211,12 +220,27 @@ get('/post/:post_id') do
     end
 end
 
+# Creates a comment on a post
+#
+# @param [String] post_id, The post id that the comment is created for
+# @param [String] user_id, The id of the user that creates the comment
+# @param [String] content, The text that the comment contains
+#
+# @see DB_Function#insert
 post('/create_comment') do
     insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
     path = '/post/' + params[:post_id].to_s
     redirect(path)
 end
 
+# Attempts to update a comment
+#
+# @param [String] comment_id, The id of the comment that should update
+# @param [String] comment, The new text for the comment
+# @param [String] post_id, The post_id that the comment is attached to
+#
+# @see DB_Function#update
+# @see DB_Function#select
 post('/update_comment') do
     if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]['user_id']
         update('comments', params[:comment_id], 'content_text', params[:comment])
@@ -225,6 +249,13 @@ post('/update_comment') do
     redirect(path) 
 end
 
+# Attempts to delete a comment
+#
+# @param [String] comment_id, The id of the comment that should gets deleted
+# @param [String] post_id, The post_id that the comment was attached to
+#
+# @see DB_Function#select
+# @see DB_Function#delete
 post('/delete_comment') do 
     comment_result = select('comments', 'id', params[:comment_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
@@ -235,6 +266,11 @@ post('/delete_comment') do
     redirect(path) 
 end
 
+# Likes a post and updates session
+#
+# @param [String] post_id, The id of the post that gets liked
+# 
+# @see DB_Function#increment
 post('/like_post') do
     session[:user_liked][params[:post_id]] = true
     increment('posts', params[:post_id], 'points', 1)
@@ -242,6 +278,11 @@ post('/like_post') do
     redirect(path) 
 end
 
+# Unlikes a post and updates session
+#
+# @param [String] post_id, The id of the post that gets unliked
+#
+# @see DB_Function#increment
 post('/unlike_post') do
     session[:user_liked][params[:post_id]] = false
     increment('posts', params[:post_id], 'points', -1)
@@ -249,6 +290,16 @@ post('/unlike_post') do
     redirect(path) 
 end
 
+# Updates a post
+#
+# @param [String] post_id, The id of the post that gets updated
+# @param [String] title, The new title of the post
+# @param [String] content_text, The new text for the post
+# 
+# @see DB_Function#update
+# @see DB_Function#select
+# @see DB_Function#genre_post_link
+# @see DB_Function#select_all
 post('/update_post') do
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
@@ -287,6 +338,12 @@ post('/update_post') do
     redirect(path)
 end
 
+# Attempts to delete a post
+#
+# @param [String] post_id, The id of the post that gets deleted
+#
+# @see DB_Function#delete
+# @see DB_Function#select
 post('/delete_post') do 
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
