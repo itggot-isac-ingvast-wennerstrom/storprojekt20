@@ -1,4 +1,4 @@
-# Projektplan
+﻿# Projektplan
 
 ## 1. Projektbeskrivning (Beskriv vad sidan ska kunna göra)
 
@@ -10,6 +10,8 @@ samt ge up- och downvotes. På ens profil kan man skriva en bio, staden man bor 
 
 ## 3. Databas med ER-diagram (Bild)
 
+![ER-diagram](ER-diagram.jpg)
+
 ## 4. Arkitektur (Beskriv filer och mappar - vad gör/inehåller de?)
 
-I Public mappen ligger bilderna till hemsidan, css, och Js filerna. I views ligger mina olika vyer och i root filen ligger min kod. I en map som heter database ligger databas filen. 
+I Public mappen ligger bilderna till hemsidan, css, och Js filerna. I views ligger mina olika vyer och i root filen ligger min kod. I en map som heter database ligger databas filen.
