@@ -9,11 +9,11 @@ div class="post_show"
         p = age
         -post_id = info['id'].to_s
         - if userliked
-            form action="/unlike_post" method="post"
+            form action="/post/unlike" method="post"
                 input type="hidden" name="post_id"  value=post_id
                 input type="submit" value="" class="unlike_btn"/
         - if !userliked
-            form action="/like_post" method="post"
+            form action="/post/like" method="post"
                 input type="hidden" name="post_id"  value=post_id   
                 input type="submit" value="hej" class="like_btn"/
             
@@ -33,7 +33,7 @@ div class="post_show"
 
     - if user[0] == session[:user_id]
         p class="post_update" Edit post
-        form action="/update_post" method="post" class="update_form"
+        form action="/post/update" method="post" class="update_form"
             - post_id = info['id'].to_s
             input type="hidden" name="post_id" value=post_id /
             input# type="text" name="title" value=info['content_title']
@@ -49,10 +49,10 @@ div class="post_show"
                     input# type="checkbox" name=id value=title checked=included
                     label for=id = title
             input type="submit" value="Edit"/
-            input type="submit" value="Delete Post" formaction="/delete_post" /
+            input type="submit" value="Delete Post" formaction="/post/delete" /
 
     p id="create_comment_fold" Create a comment
-    form action="/create_comment" method="post" class="create_comment"
+    form action="/comment/create" method="post" class="create_comment"
         - post_id = info['id'].to_s
         input type="hidden" name="post_id"  value=post_id
         textarea# name="content" cols="30" rows="10" placeholder="Write your comment here..."
@@ -65,13 +65,13 @@ div class="post_show"
                 p = 'Commented by user ' + comment['user_commented']
                 - if session[:user_id] == comment['user_id']
                     p class="comment_edit" Edit comment
-                    form action="/delete_comment" method="post" class="delete_comment_form"
+                    form action="/comment/delete" method="post" class="delete_comment_form"
                         - comment_id = comment['id'].to_s; post_id = info['id'].to_s
                         input type="hidden" name="comment_id" value=comment_id
                         input type="hidden" name="post_id" value=post_id
                         input type="submit" value="Delete comment"/
             - if session[:user_id] == comment['user_id']
-                form action="/update_comment" method="post" class="update_comment_form"
+                form action="/comment/update" method="post" class="update_comment_form"
                     textarea# name="comment" cols="30" rows="10" = comment['content_text']
                     input type="submit" value="Update"/
                     - comment_id = comment['id'].to_s; post_id = info['id'].to_s

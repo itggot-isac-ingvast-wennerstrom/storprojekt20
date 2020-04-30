@@ -143,7 +143,6 @@ module DB_Functions
     def sign_in(username, password)
         result = select('users', 'username',params[:username])
         #Checks if there's a user with that username
-        p result
         if result == []
             return 'wrong username'
         end
@@ -286,7 +285,7 @@ module DB_Functions
     def genre_post_link(table_do, post_id=nil, genre_id=nil)
         db = connect_to_db('database/db.db')
         if post_id == nil && genre_id == nil
-            return return {'msg' => "SQL Input Error"}
+            return {'msg' => "SQL Input Error"}
         end
         case table_do
         when 'insert'

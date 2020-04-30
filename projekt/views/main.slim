@@ -2,11 +2,11 @@ h1 Welcome to Memegur
 
 p = session[:error_msg]
 
-form action="/search_user" method="post"
+form action="/user/search" method="post"
     input# type="text" name="username" placeholder="Enter the username here"/
     input type="submit" value="Search"/
 
-form action="/search_post" method="post"
+form action="/post/search" method="post"
     input# type="text" name="info" placeholder="Enter the information here"/
-    input type="submit" value="Search with ID" formaction="/search_post_id"/
+    input type="submit" value="Search with ID" formaction="/post/search_id"/
     input type="submit" value="Search with title"/

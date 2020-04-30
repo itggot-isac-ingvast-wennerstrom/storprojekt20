@@ -38,9 +38,9 @@ before do
             break     
         when '/sign_in'
             break
-        when '/sign_in_user'
+        when '/user/sign_in'
             break
-        when '/create_user'
+        when '/user/create'
             break
         when '/sign_up'
             break
@@ -64,21 +64,16 @@ end
 # @param [String] password The password
 #
 # @see DB_Functions#sign_in
-post('/sign_in_user') do
+post('/user/sign_in') do
     session[:user_liked] = {}
     result = sign_in(params[:username], params[:password])
-    if result['msg'] != nil    
-        case result
-        when 'wrong username'
-            session[:error_msg] = "No user with that username"
-        when 'wrong password'
-            session[:error_msg] = "Password is wrong"
-        else
-            p result
-            session[:user_id] = result
-        end
-    else 
-        session[:error_msg] = result['info']
+    case result
+    when 'wrong username'
+        session[:error_msg] = "No user with that username"
+    when 'wrong password'
+        session[:error_msg] = "Password is wrong"
+    else
+        session[:user_id] = result
     end
     redirect('/')
 end
@@ -99,7 +94,7 @@ end
 # @see DB_Functions#select
 # @see DB_Functions#insert
 # @see Server_Functions#validate_email
-post('/create_user') do
+post('/user/create') do
     if params[:password] != params[:password_conf] #Checking if passwords match
         session[:error_msg] = "Passwords do not match"
         redirect('/sign_up')
@@ -119,7 +114,7 @@ post('/create_user') do
         session[:user_id] = select('users','username',params[:username],'id')
         redirect('/new_user_registred')
     else
-        result['msg'] != nil ? session[:error_msg] = result['msg'] : session[:error_msg] = "Account already exists with that username"
+        session[:error_msg] = "Account already exists with that username"
         redirect('/sign_up')
     end
 end
@@ -142,9 +137,6 @@ get('/profile/:username') do
     else
         is_user = false
     end
-    if result['msg'] != nil
-        session[:error_msg] = result['msg']
-    end
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
@@ -153,7 +145,6 @@ end
 # @see DB_Functions#select
 get('/profile') do
     result = select('users', 'id', session[:user_id])
-    result['msg'] == nil ? true : session[:error_msg] = result['msg']
     slim(:'user/profile',locals:{profile:result[0],is_user:true})
 end
 
@@ -162,7 +153,6 @@ end
 # @see DB_Functions#select_all
 get('/post/create') do
     result = select_all('genre')
-    result['msg'] == nil ? true : session[:error_msg] = result['msg']
     slim(:'/posts/create',locals:{genres:result})
 end
 
@@ -238,7 +228,7 @@ end
 # @param [String] content The text that the comment contains
 #
 # @see DB_Functions#insert
-post('/create_comment') do
+post('/comment/create') do
     insert('comments', ['post_id', 'user_id', 'content_text', 'date'], [params[:post_id], session[:user_id], params[:content], Time.now.to_i])
     path = '/post/' + params[:post_id].to_s
     redirect(path)
@@ -252,7 +242,7 @@ end
 #
 # @see DB_Functions#update
 # @see DB_Functions#select
-post('/update_comment') do
+post('/comment/update') do
     if session[:user_id] == select('comments', 'id', params[:comment_id], 'user_id')[0]['user_id']
         update('comments', params[:comment_id], 'content_text', params[:comment])
     end
@@ -267,7 +257,7 @@ end
 #
 # @see DB_Functions#select
 # @see DB_Functions#delete
-post('/delete_comment') do 
+post('/comment/delete') do 
     comment_result = select('comments', 'id', params[:comment_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
     if session[:user_id] == comment_result['user_id'] || user_role['role'] = 'admin'
@@ -282,7 +272,7 @@ end
 # @param [String] post_id The id of the post that gets liked
 # 
 # @see DB_Functions#increment
-post('/like_post') do
+post('/post/like') do
     session[:user_liked][params[:post_id]] = true
     increment('posts', params[:post_id], 'points', 1)
     path = '/post/' + params[:post_id].to_s
@@ -294,7 +284,7 @@ end
 # @param [String] post_id The id of the post that gets unliked
 #
 # @see DB_Functions#increment
-post('/unlike_post') do
+post('/post/unlike') do
     session[:user_liked][params[:post_id]] = false
     increment('posts', params[:post_id], 'points', -1)
     path = '/post/' + params[:post_id].to_s
@@ -311,7 +301,7 @@ end
 # @see DB_Functions#select
 # @see DB_Functions#genre_post_link
 # @see DB_Functions#select_all
-post('/update_post') do
+post('/post/update') do
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
     if session[:user_id] == post_result['user_id'] || user_role['role'] = 'admin'
@@ -355,7 +345,7 @@ end
 #
 # @see DB_Functions#delete
 # @see DB_Functions#select
-post('/delete_post') do 
+post('/post/delete') do 
     post_result = select('posts', 'id', params[:post_id], 'user_id')[0]
     user_role = select('users', 'id', session[:user_id], 'role')[0]
     if session[:user_id] == post_result['user_id'] || user_role['role'] = 'admin'
@@ -369,7 +359,7 @@ end
 # @param [String] username The username being used for the search
 #
 # @see DB_Functions#select
-post('/search_user') do 
+post('/user/search') do 
     result = select('users', 'username', params[:username], 'id')
     if result == []
         session[:error_msg] = "No user exists with that username"
@@ -385,7 +375,7 @@ end
 # @param [String] info The title that is being used for the search
 #
 # @see DB_Functions#select
-post('/search_post') do
+post('/post/search') do
     result = select('posts', 'content_title', params[:info], 'id')
     if result == []
         session[:error_msg] = "There is no post with that title"
@@ -402,7 +392,7 @@ end
 # @param [String] info The id being used in the search
 #
 # @see DB_Functions#select
-post('/search_post_id') do
+post('/post/search_id') do
     result = select('posts', 'id', params[:info])
     if result == []
         session[:error_msg] = "No posts with that id exists"
