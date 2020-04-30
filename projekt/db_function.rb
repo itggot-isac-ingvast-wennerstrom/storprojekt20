@@ -41,12 +41,10 @@ module DB_Functions
            # search_values.empty? ? session[:error_msg] = 'SQL Error' : false
         end
         if search.is_a?(Array) != search_values.is_a?(Array)
-            session[:error_msg] = "SQL Error"
-            return []
+            return {'msg' => "SQL Input Error"}
         end
         if search.is_a?(Array) && search_values.length != search.length 
-            session[:error_msg] = "SQL Error"
-            return []
+            return {'msg' => "SQL Input Error"}
         end
         #Creates array of search parameters and respective values
         if search.is_a?(Array)
@@ -85,7 +83,7 @@ module DB_Functions
             #Execute SQL string with respective values
             result = db.execute(sql_str, search_arr)
         else
-            session[:error_msg] = 'SQL Error'
+            return {'msg' => "SQL Error"}
         end
         return result
     end
@@ -134,7 +132,7 @@ module DB_Functions
             #Executes SQL String with the respective values
             db.execute(sql_str, values)           
         else 
-            session[:error_msg] = "SQL Error"
+            return {'msg' => "SQL Error"}
         end
     end
 
@@ -209,7 +207,7 @@ module DB_Functions
             #Executes SQL String with the respective values
             db.execute(sql_str, update)           
         else 
-            session[:error_msg] = "SQL Error"
+            return {'msg' => "SQL Error"}
         end
     end
 
@@ -236,7 +234,7 @@ module DB_Functions
             #Executes SQL with the respective values
             db.execute('DELETE FROM genre WHERE id = ?', id)            
         else 
-            session[:error_msg] = "SQL Error"
+            return {'msg' => "SQL Error"}
         end
     end
 
@@ -268,7 +266,7 @@ module DB_Functions
             #Executes SQL with the respective values
             db.execute('UPDATE genre SET ' + sql_str + ' WHERE id = ?', id)        
         else 
-            session[:error_msg] = "SQL Error"
+            return {'msg' => "SQL Error"}
         end
     end
 
@@ -288,7 +286,7 @@ module DB_Functions
     def genre_post_link(table_do, post_id=nil, genre_id=nil)
         db = connect_to_db('database/db.db')
         if post_id == nil && genre_id == nil
-            return nil
+            return return {'msg' => "SQL Input Error"}
         end
         case table_do
         when 'insert'

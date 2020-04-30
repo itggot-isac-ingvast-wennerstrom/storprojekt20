@@ -67,14 +67,18 @@ end
 post('/sign_in_user') do
     session[:user_liked] = {}
     result = sign_in(params[:username], params[:password])
-    case result
-    when 'wrong username'
-        session[:error_msg] = "No user with that username"
-    when 'wrong password'
-        session[:error_msg] = "Password is wrong"
-    else
-        p result
-        session[:user_id] = result
+    if result['msg'] != nil    
+        case result
+        when 'wrong username'
+            session[:error_msg] = "No user with that username"
+        when 'wrong password'
+            session[:error_msg] = "Password is wrong"
+        else
+            p result
+            session[:user_id] = result
+        end
+    else 
+        session[:error_msg] = result['info']
     end
     redirect('/')
 end
@@ -108,13 +112,14 @@ post('/create_user') do
     #Encrypts password
     password_digest = BCrypt::Password.create(params[:password])
     #Inserts values into the database
-    if select('users', 'username',params[:username]) == []
+    result = select('users', 'username',params[:username])
+    if result == []
         insert('users', ['username','password_digest','role','email'], [params[:username], password_digest,'user',params[:email]])
         #Tells the website the user is logged in
         session[:user_id] = select('users','username',params[:username],'id')
         redirect('/new_user_registred')
     else
-        session[:error_msg] = "Account already exists with that username"
+        result['msg'] != nil ? session[:error_msg] = result['msg'] : session[:error_msg] = "Account already exists with that username"
         redirect('/sign_up')
     end
 end
@@ -137,6 +142,9 @@ get('/profile/:username') do
     else
         is_user = false
     end
+    if result['msg'] != nil
+        session[:error_msg] = result['msg']
+    end
     slim(:'user/profile',locals:{profile:result[0],is_user:is_user})
 end
 
@@ -145,6 +153,7 @@ end
 # @see DB_Functions#select
 get('/profile') do
     result = select('users', 'id', session[:user_id])
+    result['msg'] == nil ? true : session[:error_msg] = result['msg']
     slim(:'user/profile',locals:{profile:result[0],is_user:true})
 end
 
@@ -152,8 +161,9 @@ end
 #
 # @see DB_Functions#select_all
 get('/post/create') do
-    genres = select_all('genre')
-    slim(:'/posts/create',locals:{genres:genres})
+    result = select_all('genre')
+    result['msg'] == nil ? true : session[:error_msg] = result['msg']
+    slim(:'/posts/create',locals:{genres:result})
 end
 
 # Attempts to create a post
